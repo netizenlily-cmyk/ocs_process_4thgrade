@@ -62,7 +62,7 @@ def process_excel_file(file_obj, password):
 
 # 🌐 Streamlit UI
 st.set_page_config(page_title="엑셀 자동 처리기", layout="centered")
-st.title("📄 OCS 정렬 프로그램 by 성연")
+st.title("OCS 변환 프로그램 by HSY")
 uploaded = st.file_uploader("엑셀 파일 업로드", type=["xlsx"])
 password = st.text_input("비밀번호 입력", type="password")
 
