@@ -34,7 +34,7 @@ def process_excel_file(file_obj, password):
         if '예약의사' not in df or '예약시간' not in df:
             continue
 
-        df['예약의사'] = df['예약의사'].str.replace(" 교수님", "", regex=False).strip()
+        df['예약의사'] = df['예약의사'].str.replace(" 교수님", "", regex=False).str.strip()
         df = df.sort_values(by=['예약의사', '예약시간'])
 
         # 예약의사 기준 줄바꿈
