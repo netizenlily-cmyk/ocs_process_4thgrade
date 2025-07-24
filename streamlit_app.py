@@ -3,7 +3,6 @@ import pandas as pd
 import io
 import msoffcrypto
 from openpyxl import load_workbook
-from openpyxl.styles import Font
 
 # 🔧 처리 함수
 def process_excel_file(file_obj, password):
@@ -19,14 +18,23 @@ def process_excel_file(file_obj, password):
     for sheet in wb.sheetnames:
         ws = wb[sheet]
         data = list(ws.values)
-        if not data or all(v is None for v in data[0]):
-            continue
 
-        df = pd.DataFrame(data[1:], columns=data[0])
+        # ✅ 비어있지 않은 줄을 헤더로 자동 인식
+        for i, row in enumerate(data):
+            if row and any(cell is not None for cell in row):
+                header = row
+                content = data[i+1:]
+                break
+        else:
+            continue  # 모든 줄이 비어 있음 → 다음 시트로
+
+        df = pd.DataFrame(content, columns=header)
         df = df.fillna("").astype(str)
+
         if '예약의사' not in df or '예약시간' not in df:
             continue
-        df['예약의사'] = df['예약의사'].str.replace(" 교수님", "", regex=False).str.strip()
+
+        df['예약의사'] = df['예약의사'].str.replace(" 교수님", "", regex=False).strip()
         df = df.sort_values(by=['예약의사', '예약시간'])
 
         # 예약의사 기준 줄바꿈
@@ -53,6 +61,7 @@ def process_excel_file(file_obj, password):
     return output
 
 # 🌐 Streamlit UI
+st.set_page_config(page_title="엑셀 자동 처리기", layout="centered")
 st.title("📄 암호화된 엑셀 자동 처리기")
 uploaded = st.file_uploader("엑셀 파일 업로드", type=["xlsx"])
 password = st.text_input("비밀번호 입력", type="password")
